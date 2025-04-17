@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {
+<<<<<<< HEAD
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   FlatList, Platform, Alert
 } from 'react-native'
@@ -49,6 +50,36 @@ export default function CreateWarpScreen() {
     setSelectedDays(prev =>
       prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
     )
+=======
+  View, Text, TextInput, TouchableOpacity,
+  StyleSheet, FlatList, Platform
+} from 'react-native'
+import DateTimePicker from '@react-native-community/datetimepicker'
+import { useNavigation } from '@react-navigation/native'
+import { useWarp } from '../context/WarpContext'
+import { Ionicons, Feather } from '@expo/vector-icons'
+
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+export default function CreateWarpScreen() {
+  const [name, setName] = useState('')
+  const [type, setType] = useState<'routine' | 'event'>('routine')
+  const [time, setTime] = useState(new Date())
+  const [showTimePicker, setShowTimePicker] = useState(false)
+  const [selectedDays, setSelectedDays] = useState<string[]>([])
+  const [items, setItems] = useState<string[]>([])
+  const [newItem, setNewItem] = useState('')
+
+  const { addWarp } = useWarp()
+  const navigation = useNavigation()
+
+  const toggleDay = (day: string) => {
+    if (selectedDays.includes(day)) {
+      setSelectedDays(selectedDays.filter(d => d !== day))
+    } else {
+      setSelectedDays([...selectedDays, day])
+    }
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
   }
 
   const addItem = () => {
@@ -67,6 +98,7 @@ export default function CreateWarpScreen() {
     setNewItem('')
   }
 
+<<<<<<< HEAD
   const scheduleRoutineNotifications = async (warpName: string, days: string[], time: Date) => {
     const hour = time.getHours()
     const minute = time.getMinutes()
@@ -122,11 +154,26 @@ export default function CreateWarpScreen() {
     })
 
     const warpData = {
+=======
+  const saveWarp = () => {
+    if (!name || items.length === 0) {
+      alert('Please complete all fields.')
+      return
+    }
+
+    const formattedTime = time.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
+    addWarp({
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
       name,
       type,
       time: formattedTime,
       items,
       days: type === 'routine' ? selectedDays : [],
+<<<<<<< HEAD
     }
 
     if (editingWarp) {
@@ -161,10 +208,17 @@ export default function CreateWarpScreen() {
         { text: 'Keep editing', style: 'default' },
       ]
     )
+=======
+    })
+
+    alert('Warp saved!')
+    navigation.navigate('MainTabs', { screen: 'Warps' })
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
   }
 
   return (
     <View style={styles.container}>
+<<<<<<< HEAD
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{editingWarp ? 'Edit Warp' : 'New Warp'}</Text>
         <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
@@ -180,12 +234,31 @@ export default function CreateWarpScreen() {
           style={styles.input}
           placeholder="Enter warp name"
           placeholderTextColor="#888"
+=======
+      {/* Botón X cerrar */}
+      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="close" size={26} color="#fff" />
+      </TouchableOpacity>
+
+      <Text style={styles.title}>New Warp</Text>
+
+      <Text style={styles.label}>Warp Name</Text>
+      <View style={styles.inputContainer}>
+        <Feather name="edit-2" size={18} style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter warp name"
+          placeholderTextColor="#5C5C5C"
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
           value={name}
           onChangeText={setName}
         />
       </View>
 
+<<<<<<< HEAD
       {/* Type */}
+=======
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
       <Text style={styles.label}>Type</Text>
       <View style={styles.switchContainer}>
         <TouchableOpacity
@@ -202,6 +275,7 @@ export default function CreateWarpScreen() {
         </TouchableOpacity>
       </View>
 
+<<<<<<< HEAD
       {/* Reminder Time */}
       <Text style={styles.label}>Reminder Time</Text>
       <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.inputContainer}>
@@ -226,6 +300,32 @@ export default function CreateWarpScreen() {
       )}
 
       {/* Repeat days */}
+=======
+      <Text style={styles.label}>Reminder Time</Text>
+      <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.inputContainer}>
+        <Ionicons name="time-outline" size={18} style={styles.icon} />
+        <Text style={[styles.input, { paddingVertical: 0 }]}>
+          {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </Text>
+      </TouchableOpacity>
+
+      {showTimePicker && (
+        <View style={styles.pickerWrapper}>
+          <DateTimePicker
+            value={time}
+            mode="time"
+            is24Hour={false}
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(event, selectedDate) => {
+              const currentDate = selectedDate || time
+              setShowTimePicker(false)
+              setTime(currentDate)
+            }}
+          />
+        </View>
+      )}
+
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
       {type === 'routine' && (
         <>
           <Text style={styles.label}>Repeat on</Text>
@@ -246,6 +346,7 @@ export default function CreateWarpScreen() {
         </>
       )}
 
+<<<<<<< HEAD
       {/* Add Item */}
       <Text style={styles.label}>Add Item</Text>
       <View style={styles.inputContainer}>
@@ -254,6 +355,15 @@ export default function CreateWarpScreen() {
           style={styles.input}
           placeholder="e.g. keys, wallet..."
           placeholderTextColor="#888"
+=======
+      <Text style={styles.label}>Add Item</Text>
+      <View style={styles.inputContainer}>
+        <Ionicons name="add-outline" size={18} style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="e.g. keys, wallet..."
+          placeholderTextColor="#5C5C5C"
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
           value={newItem}
           onChangeText={setNewItem}
           onSubmitEditing={addItem}
@@ -263,13 +373,24 @@ export default function CreateWarpScreen() {
       <FlatList
         data={items}
         keyExtractor={(item, index) => index.toString()}
+<<<<<<< HEAD
         renderItem={({ item }) => <Text style={styles.item}>• {item}</Text>}
+=======
+        renderItem={({ item }) => (
+          <Text style={styles.item}>• {item}</Text>
+        )}
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
         style={{ marginVertical: 16 }}
       />
 
       <View style={styles.buttonRow}>
+<<<<<<< HEAD
         <TouchableOpacity style={styles.buttonPrimary} onPress={saveOrUpdateWarp}>
           <Text style={styles.buttonText}>{editingWarp ? 'Update' : 'Save'}</Text>
+=======
+        <TouchableOpacity style={styles.buttonPrimary} onPress={saveWarp}>
+          <Text style={styles.buttonText}>Save</Text>
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
         </TouchableOpacity>
         <TouchableOpacity style={styles.buttonSecondary} onPress={clearForm}>
           <Text style={styles.buttonTextAlt}>Clear</Text>
@@ -284,6 +405,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#2B2520',
     padding: 24,
+<<<<<<< HEAD
     paddingTop: 60,
   },
   header: {
@@ -303,6 +425,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF6B00',
     borderRadius: 20,
     padding: 8,
+=======
+    position: 'relative',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 24,
+    textAlign: 'center',
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
   },
   label: {
     color: '#fff',
@@ -312,7 +450,11 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
+<<<<<<< HEAD
     backgroundColor: '#f2f2f2',
+=======
+    backgroundColor: '#F5F5F5',
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: Platform.OS === 'ios' ? 14 : 10,
@@ -321,11 +463,19 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 8,
+<<<<<<< HEAD
+=======
+    color: '#5C5C5C',
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
   },
   input: {
     flex: 1,
     fontSize: 16,
+<<<<<<< HEAD
     color: '#000',
+=======
+    color: '#2B2520',
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
   },
   switchContainer: {
     flexDirection: 'row',
@@ -346,6 +496,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
+<<<<<<< HEAD
+=======
+  pickerWrapper: {
+    backgroundColor: '#F5F5F5',
+    marginVertical: 10,
+    borderRadius: 14,
+  },
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
   daysContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -383,7 +541,11 @@ const styles = StyleSheet.create({
   },
   buttonSecondary: {
     flex: 1,
+<<<<<<< HEAD
     backgroundColor: '#f2f2f2',
+=======
+    backgroundColor: '#F5F5F5',
+>>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
     paddingVertical: 14,
     borderRadius: 14,
     alignItems: 'center',
