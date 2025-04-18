@@ -1,130 +1,84 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ActivityIndicator,
+  TouchableOpacity,
   FlatList,
   Alert,
 } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import { useWarp } from '../context/WarpContext'
 import { Ionicons } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native'
 
 export default function WarpsScreen() {
-  const { warps, fetchWarps, deleteWarp } = useWarp()
-  const [loading, setLoading] = useState(true)
   const navigation = useNavigation()
+  const { warps, deleteWarp } = useWarp()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      await fetchWarps()
+    const timer = setTimeout(() => {
       setLoading(false)
-    }
-    load()
+    }, 1500)
+
+    return () => clearTimeout(timer)
   }, [])
 
   const handleDelete = (id: string) => {
-    Alert.alert('Delete Warp', 'Are you sure you want to delete this warp?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => deleteWarp(id) },
-    ])
-  }
-
-  const handleEdit = (warp: any) => {
-    navigation.navigate('CreateWarp' as never, { warp } as never)
+    Alert.alert(
+      'Delete Warp',
+      'Are you sure you want to delete this warp?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => deleteWarp(id) },
+      ]
+    )
   }
 
   const renderItem = ({ item }: any) => (
-    <View style={styles.card}>
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.text}>Type: {item.type}</Text>
-      <Text style={styles.text}>Time: {item.time}</Text>
-      <Text style={styles.text}>Items: {item.items?.join(', ')}</Text>
-
-      <View style={styles.actions}>
-        <TouchableOpacity style={styles.editBtn} onPress={() => handleEdit(item)}>
+    <View style={styles.warpItem}>
+      <Text style={styles.warpName}>{item.name}</Text>
+      <Text style={styles.warpTime}>{item.time}</Text>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => navigation.navigate('CreateWarp', { warp: item })}
+        >
           <Ionicons name="create-outline" size={18} color="#fff" />
-          <Text style={styles.actionText}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item.id)}>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => handleDelete(item.id)}
+        >
           <Ionicons name="trash-outline" size={18} color="#fff" />
-          <Text style={styles.actionText}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
   )
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Your Warps 🚀</Text>
-        <ActivityIndicator size="large" color="#FF6B00" />
-      </View>
-    )
-  }
-=======
-import React from 'react'
-import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useWarp } from '../context/WarpContext'
-import { Ionicons } from '@expo/vector-icons'
-
-export default function WarpsScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<any>>()
-  const { warps } = useWarp()
->>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Your Warps 🚀</Text>
+      <Text style={styles.title}>Your Warps</Text>
 
-<<<<<<< HEAD
-      {warps.length === 0 ? (
-        <Text style={styles.emptyText}>No warps created. Tap + to add one!</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#FF6B00" style={{ marginTop: 40 }} />
+      ) : warps.length === 0 ? (
+        <Text style={styles.emptyText}>You have no warps created, press + to create a new one</Text>
       ) : (
         <FlatList
           data={warps}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 100 }}
+          style={{ marginTop: 16 }}
         />
       )}
 
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate('CreateWarp' as never)}
-      >
-        <Ionicons name="add" size={32} color="#fff" />
-=======
-      {warps.length === 0 && (
-        <Text style={styles.empty}>No warps created yet.</Text>
-      )}
-
-      <FlatList
-        data={warps}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{item.name}</Text>
-            <Text style={styles.cardText}>Type: {item.type}</Text>
-            <Text style={styles.cardText}>Time: {item.time}</Text>
-            <Text style={styles.cardText}>Items: {item.items.join(', ')}</Text>
-          </View>
-        )}
-        style={{ marginVertical: 16 }}
-      />
-
-      <TouchableOpacity
-        style={styles.fab}
         onPress={() => navigation.navigate('CreateWarp')}
       >
-        <Ionicons name="add" size={28} color="white" />
->>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
+        <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
     </View>
   )
@@ -133,115 +87,62 @@ export default function WarpsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-<<<<<<< HEAD
     backgroundColor: '#2B2520',
-    padding: 20,
-=======
-    backgroundColor: '#121212',
-    padding: 24,
->>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
+    paddingHorizontal: 20,
+    paddingTop: 50,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#fff',
-<<<<<<< HEAD
-    marginBottom: 16,
-    textAlign: 'center',
   },
-  emptyText: {
-    color: '#ccc',
-    textAlign: 'center',
-    marginTop: 60,
-  },
-  card: {
-    backgroundColor: '#3a332f',
+  warpItem: {
+    backgroundColor: '#f2f2f2',
     padding: 16,
     borderRadius: 14,
     marginBottom: 12,
   },
-  name: {
-    color: '#fff',
-    fontWeight: 'bold',
+  warpName: {
     fontSize: 18,
+    fontWeight: '600',
     marginBottom: 4,
   },
-  text: {
-    color: '#ccc',
+  warpTime: {
     fontSize: 14,
+    color: '#666',
   },
-  actions: {
+  buttonRow: {
     flexDirection: 'row',
-    marginTop: 12,
+    justifyContent: 'flex-end',
+    marginTop: 10,
   },
-  editBtn: {
-    flexDirection: 'row',
+  editButton: {
     backgroundColor: '#FF6B00',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    marginRight: 10,
-    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8,
+    marginRight: 8,
   },
-  deleteBtn: {
-    flexDirection: 'row',
-    backgroundColor: '#D33C32',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    alignItems: 'center',
+  deleteButton: {
+    backgroundColor: '#C0392B',
+    padding: 8,
+    borderRadius: 8,
   },
-  actionText: {
+  emptyText: {
     color: '#fff',
-    marginLeft: 6,
-    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 40,
+    fontSize: 16,
   },
   fab: {
-    backgroundColor: '#FF6B00',
-    borderRadius: 50,
     position: 'absolute',
     right: 20,
-    bottom: 40,
-    width: 56,
-    height: 56,
+    bottom: 30,
+    backgroundColor: '#FF6B00',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
-=======
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  empty: {
-    color: '#888',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  card: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 12,
-  },
-  cardTitle: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  cardText: {
-    color: '#bbb',
-    fontSize: 14,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    backgroundColor: '#FF6B00',
-    padding: 16,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 4,
->>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
   },
 })

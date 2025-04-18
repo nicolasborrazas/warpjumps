@@ -1,119 +1,83 @@
-<<<<<<< HEAD
-// src/context/WarpContext.tsx
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from './AuthContext'
 
-export interface Warp {
-  id?: string
-=======
-import React, { createContext, useContext, useState } from 'react'
-
-export interface Warp {
->>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
+type Warp = {
+  id: string
   name: string
   type: 'routine' | 'event'
   time: string
   items: string[]
-<<<<<<< HEAD
   days?: string[]
-  created_at?: string
-  user_id?: string
-=======
->>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
 }
 
-interface WarpContextType {
+type WarpContextType = {
   warps: Warp[]
-<<<<<<< HEAD
-  addWarp: (warp: Warp) => Promise<void>
-  deleteWarp: (id: string) => Promise<void>
-  updateWarp: (id: string, updatedData: Partial<Warp>) => Promise<void>
-  fetchWarps: () => Promise<void>
-=======
-  addWarp: (warp: Warp) => void
->>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
+  addWarp: (warp: Omit<Warp, 'id'>) => void
+  updateWarp: (id: string, warp: Omit<Warp, 'id'>) => void
+  deleteWarp: (id: string) => void
 }
 
 const WarpContext = createContext<WarpContextType | undefined>(undefined)
 
-export const WarpProvider = ({ children }: { children: React.ReactNode }) => {
+export const WarpProvider = ({ children }: { children: ReactNode }) => {
+  const { session } = useAuth()
   const [warps, setWarps] = useState<Warp[]>([])
-<<<<<<< HEAD
-  const { user } = useAuth()
+
+  useEffect(() => {
+    if (session?.user.id) {
+      fetchWarps()
+    }
+  }, [session])
 
   const fetchWarps = async () => {
-    if (!user) return
-
     const { data, error } = await supabase
       .from('warps')
       .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
+      .eq('user_id', session?.user.id)
 
-    if (error) {
-      console.error('Error loading warps:', error.message)
-    } else {
-      setWarps(data || [])
+    if (!error && data) {
+      setWarps(data)
     }
   }
 
-  const addWarp = async (warp: Warp) => {
-    if (!user) return
+  const addWarp = async (warp: Omit<Warp, 'id'>) => {
+    const warpWithUser = { ...warp, user_id: session?.user.id }
+    const { data, error } = await supabase.from('warps').insert(warpWithUser).select()
+    if (!error && data && data[0]) {
+      setWarps(prev => [...prev, data[0]])
+    }
+  }
 
-    const { data, error } = await supabase.from('warps').insert([
-      {
-        ...warp,
-        user_id: user.id,
-      },
-    ])
+  const updateWarp = async (id: string, updatedWarp: Omit<Warp, 'id'>) => {
+    const { data, error } = await supabase
+      .from('warps')
+      .update(updatedWarp)
+      .eq('id', id)
+      .select()
 
-    if (error) {
-      console.error('Error saving warp:', error.message)
-    } else {
-      fetchWarps()
+    if (!error && data && data[0]) {
+      setWarps(prev =>
+        prev.map(w => (w.id === id ? { ...data[0] } : w))
+      )
     }
   }
 
   const deleteWarp = async (id: string) => {
     const { error } = await supabase.from('warps').delete().eq('id', id)
-    if (error) {
-      console.error('Error deleting warp:', error.message)
-    } else {
+    if (!error) {
       setWarps(prev => prev.filter(w => w.id !== id))
     }
   }
 
-  const updateWarp = async (id: string, updatedData: Partial<Warp>) => {
-    const { error } = await supabase
-      .from('warps')
-      .update(updatedData)
-      .eq('id', id)
-
-    if (error) {
-      console.error('Error updating warp:', error.message)
-    } else {
-      fetchWarps()
-    }
-  }
-
-  useEffect(() => {
-    if (user) {
-      fetchWarps()
-    }
-  }, [user])
-
   return (
-    <WarpContext.Provider value={{ warps, addWarp, deleteWarp, updateWarp, fetchWarps }}>
-=======
-
-  const addWarp = (warp: Warp) => {
-    setWarps((prev) => [...prev, warp])
-  }
-
-  return (
-    <WarpContext.Provider value={{ warps, addWarp }}>
->>>>>>> 1757a3a643b8a8946c996fd7cb8092b6d19f89be
+    <WarpContext.Provider value={{ warps, addWarp, updateWarp, deleteWarp }}>
       {children}
     </WarpContext.Provider>
   )
