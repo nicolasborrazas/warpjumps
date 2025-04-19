@@ -62,7 +62,7 @@ export default function SettingsScreen() {
     ])
 
   const confirmDeleteWarps = () =>
-    Alert.alert('Delete All Warps', 'Are you sure you want to delete all Warps?', [
+    Alert.alert('Delete All Warps', 'Are you sure you want to delete all Reminders?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', onPress: () => Alert.alert('All Warps deleted') },
     ])

@@ -5,7 +5,10 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  Modal,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native'
 import { Ionicons, Feather } from '@expo/vector-icons'
 import { supabase } from '../lib/supabaseClient'
@@ -15,9 +18,12 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('')
   const [isLogin, setIsLogin] = useState(true)
 
+  const [resetModalVisible, setResetModalVisible] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+
   const handleAuth = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields.')
+      alert('Please fill in all fields.')
       return
     }
 
@@ -26,32 +32,34 @@ export default function LoginScreen() {
       : await supabase.auth.signUp({ email, password })
 
     if (error) {
-      Alert.alert('Error', error.message)
+      alert(error.message)
     } else {
-      Alert.alert('Success', isLogin ? 'Logged in!' : 'Account created!')
+      alert(isLogin ? 'Logged in!' : 'Account created!')
     }
   }
 
   const handleForgotPassword = async () => {
-    if (!email) {
-      Alert.alert('Forgot Password', 'Please enter your email address first.')
+    if (!resetEmail) {
+      alert('Please enter your email address.')
       return
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://warp-jumps-reset-page.com' // <-- reemplaza con tu URL real
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: 'https://warp-jumps-reset-page.com',
     })
 
     if (error) {
-      Alert.alert('Error', error.message)
+      alert(error.message)
     } else {
-      Alert.alert('Check your email', 'We sent you a password reset link.')
+      alert('Check your email for a reset link.')
+      setResetModalVisible(false)
+      setResetEmail('')
     }
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.welcome}>Welcome to Warp Jumps 🚀</Text>
+      <Text style={styles.welcome}>Welcome to Reminders</Text>
       <Text style={styles.title}>{isLogin ? 'Login' : 'Register'}</Text>
 
       {/* Email */}
@@ -62,6 +70,7 @@ export default function LoginScreen() {
           placeholder="Email"
           placeholderTextColor="#999"
           autoCapitalize="none"
+          autoComplete="email"
           keyboardType="email-address"
           onChangeText={setEmail}
           value={email}
@@ -83,7 +92,7 @@ export default function LoginScreen() {
 
       {/* Forgot Password */}
       {isLogin && (
-        <TouchableOpacity onPress={handleForgotPassword}>
+        <TouchableOpacity onPress={() => setResetModalVisible(true)}>
           <Text style={styles.forgotText}>Forgot Password?</Text>
         </TouchableOpacity>
       )}
@@ -103,6 +112,40 @@ export default function LoginScreen() {
             : 'Already have an account? Login'}
         </Text>
       </TouchableOpacity>
+
+      {/* Reset Password Modal */}
+      <Modal
+        transparent
+        animationType="slide"
+        visible={resetModalVisible}
+        onRequestClose={() => setResetModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Reset Password</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter your email"
+              placeholderTextColor="#999"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={resetEmail}
+              onChangeText={setResetEmail}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Pressable style={[styles.modalButton, { backgroundColor: '#FF6B00' }]} onPress={handleForgotPassword}>
+                <Text style={styles.modalButtonText}>Send</Text>
+              </Pressable>
+              <Pressable style={[styles.modalButton, { backgroundColor: '#444' }]} onPress={() => setResetModalVisible(false)}>
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   )
 }
@@ -167,5 +210,47 @@ const styles = StyleSheet.create({
   toggleText: {
     color: '#bbb',
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: '#000000aa',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#2B2520',
+    padding: 24,
+    borderRadius: 14,
+    width: '80%',
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  modalTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  modalInput: {
+    backgroundColor: '#1e1e1e',
+    color: '#fff',
+    fontSize: 16,
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 16,
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 8,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
 })

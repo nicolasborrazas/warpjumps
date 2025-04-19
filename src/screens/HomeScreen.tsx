@@ -21,12 +21,12 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.greeting}>{greeting()} 👋</Text>
-      <Text style={styles.subtext}>Welcome back to Warp Jumps</Text>
+      <Text style={styles.subtext}>Welcome back to Reminders</Text>
 
       {/* Next Warps */}
-      <Text style={styles.sectionTitle}>Next Warps</Text>
+      <Text style={styles.sectionTitle}>Next Reminder</Text>
       {nextWarps.length === 0 ? (
-        <Text style={styles.emptyText}>You have no upcoming warps.</Text>
+        <Text style={styles.emptyText}>You have no upcoming reminder.</Text>
       ) : (
         <FlatList
           data={nextWarps}
@@ -47,7 +47,7 @@ export default function HomeScreen() {
       <View style={styles.actionsRow}>
         <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('CreateWarp')}>
           <Ionicons name="add-circle-outline" size={26} color="#FF6B00" />
-          <Text style={styles.actionText}>New Warp</Text>
+          <Text style={styles.actionText}>New Reminder</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Warps')}>
           <Ionicons name="list-outline" size={26} color="#FF6B00" />
@@ -58,7 +58,7 @@ export default function HomeScreen() {
       {/* Stats Summary */}
       <Text style={styles.sectionTitle}>Stats</Text>
       <View style={styles.statsBox}>
-        <Text style={styles.statsText}>Total Warps: {warps.length}</Text>
+        <Text style={styles.statsText}>Total Reminders: {warps.length}</Text>
         <Text style={styles.statsText}>Routines: {warps.filter(w => w.type === 'routine').length}</Text>
         <Text style={styles.statsText}>Events: {warps.filter(w => w.type === 'event').length}</Text>
       </View>

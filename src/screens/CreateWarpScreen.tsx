@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  FlatList, Platform, Alert
+  FlatList, Platform, Alert, Modal
 } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useNavigation, useRoute } from '@react-navigation/native'
@@ -17,6 +17,7 @@ export default function CreateWarpScreen() {
 
   const [name, setName] = useState(editingWarp?.name || '')
   const [type, setType] = useState<'routine' | 'event'>(editingWarp?.type || 'routine')
+  const [premiumModalVisible, setPremiumModalVisible] = useState(false)
 
   const [time, setTime] = useState(() => {
     if (editingWarp?.time) {
@@ -72,16 +73,10 @@ export default function CreateWarpScreen() {
         },
       })
     } else if (type === 'routine') {
+      const weekdayMap: any = {
+        Sun: 1, Mon: 2, Tue: 3, Wed: 4, Thu: 5, Fri: 6, Sat: 7,
+      }
       for (const day of days) {
-        const weekdayMap: any = {
-          Sun: 1,
-          Mon: 2,
-          Tue: 3,
-          Wed: 4,
-          Thu: 5,
-          Fri: 6,
-          Sat: 7,
-        }
         await Notifications.scheduleNotificationAsync({
           content: {
             title: '⏰ Routine Reminder',
@@ -131,7 +126,7 @@ export default function CreateWarpScreen() {
   const handleClose = () => {
     Alert.alert(
       'Discard changes?',
-      'Do you want to discard changes or delete this warp?',
+      'Do you want to discard changes or delete this Reminder?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -147,17 +142,46 @@ export default function CreateWarpScreen() {
     )
   }
 
+  const handleEventPress = () => {
+    setPremiumModalVisible(true)
+  }
+
+  const handleUpgrade = () => {
+    setPremiumModalVisible(false)
+    Alert.alert('Coming soon', 'Subscription management is not available yet.')
+  }
+
   return (
     <View style={styles.container}>
+      {/* Modal Premium */}
+      <Modal visible={premiumModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setPremiumModalVisible(false)}
+            >
+              <Ionicons name="close" size={20} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Premium Feature</Text>
+            <Text style={styles.modalText}>Creating event reminders is a premium feature.</Text>
+            <TouchableOpacity style={styles.modalButtonPrimary} onPress={handleUpgrade}>
+              <Text style={styles.modalButtonText}>Manage Subscription</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{editingWarp ? 'Edit Warp' : 'New Warp'}</Text>
+        <Text style={styles.headerTitle}>{editingWarp ? 'Edit Warp' : 'New Reminder'}</Text>
         <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
           <Ionicons name="close" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
 
       {/* Warp Name */}
-      <Text style={styles.label}>Warp Name</Text>
+      <Text style={styles.label}>Reminder Name</Text>
       <View style={styles.inputContainer}>
         <Feather name="edit-2" size={18} color="#444" style={styles.icon} />
         <TextInput
@@ -179,7 +203,7 @@ export default function CreateWarpScreen() {
           <Text style={styles.switchText}>Routine</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => setType('event')}
+          onPress={handleEventPress}
           style={[styles.switch, type === 'event' && styles.switchSelected]}
         >
           <Text style={styles.switchText}>Event</Text>
@@ -328,4 +352,52 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   buttonTextAlt: { color: '#FF6B00', fontWeight: 'bold', fontSize: 16 },
+
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContent: {
+    backgroundColor: '#2B2520',
+    padding: 24,
+    borderRadius: 16,
+    width: '85%',
+    alignItems: 'center',
+    elevation: 10,
+    position: 'relative',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#FF6B00',
+    borderRadius: 20,
+    padding: 6,
+    zIndex: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  modalText: {
+    color: '#ccc',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButtonPrimary: {
+    backgroundColor: '#FF6B00',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
 })
